@@ -46,7 +46,7 @@ QTRSensorsRC qtrrc((unsigned char[]) {
  unsigned int sensors[6];
 int balanceDuBlanc[] = {0,0,0,0,0,0};
 int values[] = {0,0,0,0,0,0};
-const int baseSpeed = 150;
+const int baseSpeed = 120;
 boolean onBlack[] = {false,false,false,false,false,false};
 
 
