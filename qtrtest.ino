@@ -46,7 +46,7 @@ QTRSensorsRC qtrrc((unsigned char[]) {
  unsigned int sensors[6];
 int balanceDuBlanc[] = {0,0,0,0,0,0};
 int values[] = {0,0,0,0,0,0};
-const int baseSpeed = 120;
+int baseSpeed = 250;
 boolean onBlack[] = {false,false,false,false,false,false};
 
 
@@ -188,6 +188,7 @@ void setBLEbutton(int buttnum,bool status){
   if(buttnum == 1){
   stopBLE = true;
   automatique = !automatique;
+  baseSpeed = 110;
 }else if(buttnum == 5){
   BLEahead = status;
 }else if(buttnum == 6){
@@ -197,6 +198,12 @@ void setBLEbutton(int buttnum,bool status){
   BLEleft=status;
 }else if(buttnum == 8){
   BLEright = status;
+}else if(buttnum == 2){
+  baseSpeed = 250;
+}else if(buttnum == 3){
+  baseSpeed = 180;
+}else if(buttnum == 4){
+  baseSpeed = 110;
 }
 }
 void readBLE(){
