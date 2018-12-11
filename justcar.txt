@@ -1,0 +1,145 @@
+#include <QTRSensors.h>
+/* ble */
+
+#include <string.h>
+#include <Arduino.h>
+#include <SPI.h>
+#define NUM_SENSORS  6     // number of sensors used
+#define TIMEOUT       2500  // waits for 2500 us for sensor outputs to go low
+#define EMITTER_PIN   13     // emitter is controlled by digital pin 2
+//-- MOTEUR A --
+int ENA=5; //Connecté à Arduino pin 5(sortie pwm)
+int IN1=2; //Connecté à Arduino pin 2
+int IN2=3; //Connecté à Arduino pin 3
+
+//-- MOTEUR B --
+int ENB=6; //Connecté à Arduino pin 6(Sortie pwm)
+int IN3=4; //Connecté à Arduino pin 4
+int IN4=7; //Connecté à Arduino pin 7
+const int pinMODE = 0;
+bool forwardStatus = true;
+bool stopBLE = false;
+QTRSensorsRC qtrrc((unsigned char[]) {
+  A0, A1, A2, A3, A4, A5
+} , NUM_SENSORS, TIMEOUT, EMITTER_PIN); // sensor connected through analog pins A0 - A7 i.e. digital pins 14-19 in uno
+ unsigned int sensors[6];
+int balanceDuBlanc[] = {0,0,0,0,0,0};
+int values[] = {0,0,0,0,0,0};
+int baseSpeed = 250;
+boolean onBlack[] = {false,false,false,false,false,false};
+
+
+/* fin fontions aides */
+void forward_setting(bool status){
+  if(status==false){
+      // Direction du Moteur A
+      digitalWrite(IN1,LOW); 
+      digitalWrite(IN2,HIGH);
+      
+      // Direction du Moteur B
+      // NB: en sens inverse du moteur A
+      digitalWrite(IN3,HIGH);
+      digitalWrite(IN4,LOW);
+  }else{
+          // Direction du Moteur A
+      digitalWrite(IN1,HIGH); 
+      digitalWrite(IN2,LOW);
+      
+      // Direction du Moteur B
+      // NB: en sens inverse du moteur A
+      digitalWrite(IN3,LOW);
+      digitalWrite(IN4,HIGH);
+  }
+  forwardStatus = status;
+}
+void setup() {
+    Serial.begin(9600);
+
+   int i;
+  for (int i = 0; i < 100; i++) // calibrate for sometime by sliding the sensors across the line, or you may use auto-calibration instead
+
+   // qtrrc.calibrate();
+  delay(20);
+
+  delay(500); // wait for 2s to position the bot before entering the main loop
+
+  Serial.println("|--------- VOITURE -------|");
+  Serial.println("|    calibr. terminée     |");
+  Serial.println("* Placer la voiture sur une feuille blanche (1s )");
+  delay(500);
+  int tmp = 0;
+  qtrrc.read(sensors);
+
+  for (unsigned char i = 0; i < NUM_SENSORS; i++)
+  {
+    balanceDuBlanc[i] = sensors[i];
+    if(balanceDuBlanc[i] == 0){
+      balanceDuBlanc[i]++;
+    }
+  }
+   pinMode(ENA,OUTPUT);//Configurer les broches comme sortie
+ pinMode(ENB,OUTPUT);
+ pinMode(IN1,OUTPUT);
+ pinMode(IN2,OUTPUT);
+ pinMode(IN3,OUTPUT);
+ pinMode(IN4,OUTPUT);
+ digitalWrite(ENA,LOW);// Moteur A - Ne pas tourner (désactivation moteur)
+ digitalWrite(ENB,LOW);// Moteur B - Ne pas tourner (désactivation moteur)
+
+forward_setting(false);
+
+}
+
+void turnRight(){
+  analogWrite(ENA,0);
+  analogWrite(ENB,baseSpeed);
+  //delay(10);
+}
+void turnLeft(){
+  analogWrite(ENA,baseSpeed);
+  analogWrite(ENB,0);
+  //delay(10);
+}
+void straightAhead(){
+  analogWrite(ENA,baseSpeed);
+  analogWrite(ENB,baseSpeed);
+  //delay(10);
+
+}
+void stop_motors(){
+  analogWrite(ENA,0);
+  analogWrite(ENB,0);
+}
+
+
+void loop() {
+
+
+     qtrrc.read(sensors);
+  
+    for (unsigned char i = 0; i < NUM_SENSORS; i++)
+    {
+      values[i] = sensors[i]-balanceDuBlanc[i];
+      if(values[i]>400){
+        onBlack[i]= true;
+      }else{
+        onBlack[i]=false;
+      }
+      Serial.print(onBlack[i]);
+      Serial.print("\t | \t ");
+    }
+    for (unsigned char i = 0; i < NUM_SENSORS; i++)
+    {
+      if(onBlack[i] == true){
+        if(i==0 || i== 1){
+          turnRight();
+        }else if(i==2 || i == 3){
+          straightAhead();
+        }else if(i==4 || i == 5 ){
+          turnLeft();
+        }
+      }
+    }
+ 
+
+}
