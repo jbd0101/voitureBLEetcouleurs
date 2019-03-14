@@ -10,7 +10,7 @@
 
 #include "BluefruitConfig.h"
 
-#define MODE_BLE_NAME               "voiture de jc !"  
+#define MODE_BLE_NAME               "voiture de nicolas !"  
 #define FACTORYRESET_ENABLE         0
 #define MINIMUM_FIRMWARE_VERSION    "0.6.6"
 #define MODE_LED_BEHAVIOUR          "MODE"
@@ -66,7 +66,7 @@ extern uint8_t packetbuffer[];
 /* fin fontions aides */
 void forward_setting(bool status){
   if(status==false){
-      // Direction du Moteur A
+       // Direction du Moteur A
       digitalWrite(IN1,LOW); 
       digitalWrite(IN2,HIGH);
       
@@ -75,7 +75,9 @@ void forward_setting(bool status){
       digitalWrite(IN3,HIGH);
       digitalWrite(IN4,LOW);
   }else{
-          // Direction du Moteur A
+
+
+                // Direction du Moteur A
       digitalWrite(IN1,HIGH); 
       digitalWrite(IN2,LOW);
       
@@ -129,7 +131,7 @@ void setup() {
   // end ble 
   // end ble 
    int i;
-  for (int i = 0; i < 100; i++) // calibrate for sometime by sliding the sensors across the line, or you may use auto-calibration instead
+  for (int i = 0; i < 100; i++) // calibrate for sometime by sliding  ;0 sensors across the line, or you may use auto-calibration instead
 
    // qtrrc.calibrate();
   delay(20);
@@ -188,7 +190,7 @@ void setBLEbutton(int buttnum,bool status){
   if(buttnum == 1){
   stopBLE = true;
   automatique = !automatique;
-  baseSpeed = 110;
+  baseSpeed = 80;
 }else if(buttnum == 5){
   BLEahead = status;
 }else if(buttnum == 6){
@@ -233,13 +235,13 @@ void loop() {
     for (unsigned char i = 0; i < NUM_SENSORS; i++)
     {
       values[i] = sensors[i]-balanceDuBlanc[i];
-      if(values[i]>400){
+      if(values[i]>250){
         onBlack[i]= true;
       }else{
         onBlack[i]=false;
       }
-      Serial.print(onBlack[i]);
-      Serial.print("\t | \t ");
+      /*Serial.print(onBlack[i]);
+      Serial.print("\t | \t "); */
     }
     for (unsigned char i = 0; i < NUM_SENSORS; i++)
     {
@@ -253,7 +255,7 @@ void loop() {
         }
       }
     }
-    Serial.println();
+    //Serial.println();
  }else{
 
     if(BLEright == true){
